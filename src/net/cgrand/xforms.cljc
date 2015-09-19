@@ -3,7 +3,7 @@
   {:author "Christophe Grand"}
   (:refer-clojure :exclude [reduce into count for partition str juxt first])
   (:require #?(:clj [clojure.core :as clj]
-               :cljs [cljs.core :as clj])))
+               :cljs [cljs.core :as clj :refer-macros [for]])))
 
 (defmacro for
   "Like clojure.core/for with the first expression being replaced by % (or _). Returns a transducer."
@@ -34,7 +34,7 @@
   #?(:clj Object :cljs object) (some-kvrf [_] nil)
   nil (some-kvrf [_] nil))
 
-#_(defmacro kvrf [name? & fn-bodies]
+(defmacro kvrf [name? & fn-bodies]
   (let [name (if (symbol? name?) name? (gensym '_))
         fn-bodies (if (symbol? name?) fn-bodies (cons name? fn-bodies))
         fn-bodies (if (vector? (clj/first fn-bodies)) (list fn-bodies) fn-bodies)]
