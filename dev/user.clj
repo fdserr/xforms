@@ -5,7 +5,7 @@
     cljs.repl.node
     cljs.repl.browser))
 
-;; Rockin' lein/cljs dev tools by Priyatam Mudivarti
+;; Rockin' lein/cljs/cljc dev tools by Priyatam Mudivarti
 ;; https://github.com/priyatam
 ;; See facjure/gardener
 ;; https://github.com/facjure/gardener

@@ -7,12 +7,11 @@
                  [org.clojure/clojurescript "1.7.48" :classifier "aot"
                   :exclusion [org.clojure/data.json]]
                  [org.clojure/data.json "0.2.6" :classifier "aot"]]
-  :jvm-opts ^:replace ["-Xmx1g" "-server"]
   :clean-targets ["target" "release"]
   :target-path "target"
   :profiles
-  {:dev {:source-paths           ["src" "test" "dev"]
-         :dependencies           [[lein-npm "0.6.1"]]
+  {:dev {:source-paths ["src" "test" "dev"]
+         :dependencies [[lein-npm "0.6.1"]]
          :npm {:dependencies [[source-map-support "0.3.2"]]}
          :plugins [[lein-npm "0.6.1"]]}}
   :aliases {"build-cljs" ["run" "-m" "user/build"]

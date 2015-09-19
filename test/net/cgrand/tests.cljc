@@ -4,7 +4,7 @@
        :clj  [clojure.test :as t :refer [is are deftest testing]])
     net.cgrand.xforms-test))
 
-;; Rockin' lein/cljs dev tools by Priyatam Mudivarti
+;; Rockin' lein/cljs/cljc dev tools by Priyatam Mudivarti
 ;; https://github.com/priyatam
 ;; See facjure/gardener
 ;; https://github.com/facjure/gardener

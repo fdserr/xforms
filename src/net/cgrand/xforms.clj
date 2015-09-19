@@ -125,7 +125,7 @@
   "Reducing function to build strings in linear time. Acts as replacement for clojure.core/str in a reduce/transduce call."
   (completing str! clj/str))
 
-;; for both map entries and vectors 
+;; for both map entries and vectors
 (defn- key' [kv] (nth kv 0))
 (defn- val' [kv] (nth kv 1))
 
@@ -232,7 +232,7 @@
   "Reducing fn to compute the arithmetic mean."
   ([]
     (let [count (volatile! 0)
-          sum (volatile! 0)] 
+          sum (volatile! 0)]
       (fn secret-container
         ([] (when (pos? @count) (/ @sum @count)))
         ([n]
@@ -286,7 +286,7 @@
       ([] (mapv #(vector % (volatile! (%))) rfns))
       ([acc] (mapv (fn [[rf vacc]] (rf (unreduced @vacc))) acc))
       ([acc x]
-        (let [some-unreduced (clj/reduce (fn [some-unreduced [rf vacc]] 
+        (let [some-unreduced (clj/reduce (fn [some-unreduced [rf vacc]]
                                            (when-not (reduced? @vacc) (vswap! vacc rf x) true))
                                false acc)]
           (if some-unreduced acc (reduced acc)))))))
@@ -318,4 +318,3 @@
         ((reduce (apply f (sequence args xforms-map))) rf))))
   ([xforms-map coll]
     (transduce (transjuxt xforms-map) first coll)))
-
