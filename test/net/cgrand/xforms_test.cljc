@@ -1,8 +1,14 @@
 (ns net.cgrand.xforms-test
-  (:require [clojure.test :refer :all]
-            [net.cgrand.xforms :as x]))
+  (:require
+    #?(:cljs [cljs.test :refer-macros [is are deftest testing]]
+       :clj  [clojure.test :refer :all])
+            #_[net.cgrand.xforms :as x]))
 
-(defn trial
+(deftest testing-tests
+  (testing "Are tests running?"
+    (is (= :x :y))))
+
+#_(defn trial
   "A transducing context for testing that transducers are well-behaved towards
   linear use of the accumulator, init, completion and handling of reduced values.
   A \"poisonous\" reducing function rf is passed to the transducer.
@@ -45,8 +51,9 @@
         (throw (ex-info "Completion arity never called" @vstate)))
       true)))
 
-(deftest proper-rf-usage
+#_(deftest proper-rf-usage
   (testing "Ensuring that reducing functions returned by transducers are well-behaved."
+    (is (= :x :y))
     (is (trial (x/by-key odd? identity)
           4 (range 16)))
     (is (trial (x/by-key odd? identity nil identity)

@@ -1,0 +1,4 @@
+
+.lein-failures
+/target/
+/node_modules/
