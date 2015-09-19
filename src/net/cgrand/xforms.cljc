@@ -5,7 +5,7 @@
   (:require #?(:clj [clojure.core :as clj]
                :cljs [cljs.core :as clj])))
 
-#_(defmacro for
+(defmacro for
   "Like clojure.core/for with the first expression being replaced by % (or _). Returns a transducer."
   [[binding %or_ & seq-exprs] body]
   (assert (and (symbol? %or_) (#{"%" "_"} (name %or_)))
@@ -27,11 +27,11 @@
          ([~acc] (~rf ~acc))
          ([~acc ~binding] ~body)))))
 
-#_(defprotocol KvRfable "Protocol for reducing fns that takes key and val as separate arguments."
+(defprotocol KvRfable "Protocol for reducing fns that takes key and val as separate arguments."
   (some-kvrf [f] "Returns a kvrf or nil"))
 
-#_(extend-protocol KvRfable
-  Object (some-kvrf [_] nil)
+(extend-protocol KvRfable
+  #?(:clj Object :cljs object) (some-kvrf [_] nil)
   nil (some-kvrf [_] nil))
 
 #_(defmacro kvrf [name? & fn-bodies]
