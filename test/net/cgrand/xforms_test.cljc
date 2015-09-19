@@ -2,7 +2,7 @@
   (:require
     #?(:cljs [cljs.test :refer-macros [is are deftest testing]]
        :clj  [clojure.test :refer :all])
-            #_[net.cgrand.xforms :as x]))
+    [net.cgrand.xforms :as x]))
 
 (deftest testing-tests
   (testing "Are tests running?"

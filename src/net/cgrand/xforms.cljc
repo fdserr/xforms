@@ -2,9 +2,10 @@
   "Extra transducers for Clojure"
   {:author "Christophe Grand"}
   (:refer-clojure :exclude [reduce into count for partition str juxt first])
-  (:require [clojure.core :as clj]))
+  (:require #?(:clj [clojure.core :as clj]
+               :cljs [cljs.core :as clj])))
 
-(defmacro for
+#_(defmacro for
   "Like clojure.core/for with the first expression being replaced by % (or _). Returns a transducer."
   [[binding %or_ & seq-exprs] body]
   (assert (and (symbol? %or_) (#{"%" "_"} (name %or_)))
@@ -26,14 +27,14 @@
          ([~acc] (~rf ~acc))
          ([~acc ~binding] ~body)))))
 
-(defprotocol KvRfable "Protocol for reducing fns that takes key and val as separate arguments."
+#_(defprotocol KvRfable "Protocol for reducing fns that takes key and val as separate arguments."
   (some-kvrf [f] "Returns a kvrf or nil"))
 
-(extend-protocol KvRfable
+#_(extend-protocol KvRfable
   Object (some-kvrf [_] nil)
   nil (some-kvrf [_] nil))
 
-(defmacro kvrf [name? & fn-bodies]
+#_(defmacro kvrf [name? & fn-bodies]
   (let [name (if (symbol? name?) name? (gensym '_))
         fn-bodies (if (symbol? name?) fn-bodies (cons name? fn-bodies))
         fn-bodies (if (vector? (clj/first fn-bodies)) (list fn-bodies) fn-bodies)]
@@ -45,7 +46,7 @@
        ~@(clj/for [[args & body] fn-bodies]
            `(invoke [~name ~@args] ~@body)))))
 
-(defn reduce
+#_(defn reduce
   "A transducer that reduces a collection to a 1-item collection consisting of only the reduced result.
    Unlike reduce but like transduce it does call the completing arity (1) of the reducing fn."
   ([f]
@@ -73,7 +74,7 @@
   ([f init]
     (reduce (fn ([] init) ([acc] (f acc)) ([acc x] (f acc x))))))
 
-(defn- into-rf [to]
+#_(defn- into-rf [to]
   (cond
     (instance? clojure.lang.IEditableCollection to)
     (if (map? to)
@@ -98,7 +99,7 @@
       ([acc] acc)
       ([acc x] (conj acc x)))))
 
-(defn into
+#_(defn into
   "Like clojure.core/into but with a 1-arg arity returning a transducer which accumulate every input in a collection and outputs only the accumulated collection."
   ([to]
     (reduce (into-rf to)))
@@ -110,33 +111,33 @@
         (rf (clj/reduce-kv rf (rf) from))
         (rf (clj/reduce rf (rf) from))))))
 
-(defmacro ^:private or-instance? [class x y]
+#_(defmacro ^:private or-instance? [class x y]
   (let [xsym (gensym 'x_)]
     `(let [~xsym ~x]
        (if (instance? ~class ~xsym) ~(with-meta xsym {:tag class}) ~y))))
 
-(defn str!
+#_(defn str!
   "Like xforms/str but returns a StringBuilder."
   ([] (StringBuilder.))
   ([sb] (or-instance? StringBuilder sb (StringBuilder. (clj/str sb)))) ; the instance? checks are for compatibility with str in case of seeded reduce/transduce.
   ([sb x] (.append (or-instance? StringBuilder sb (StringBuilder. (clj/str sb))) x)))
 
-(def str
+#_(def str
   "Reducing function to build strings in linear time. Acts as replacement for clojure.core/str in a reduce/transduce call."
   (completing str! clj/str))
 
 ;; for both map entries and vectors
-(defn- key' [kv] (nth kv 0))
-(defn- val' [kv] (nth kv 1))
+#_(defn- key' [kv] (nth kv 0))
+#_(defn- val' [kv] (nth kv 1))
 
-(defn- noprf "The noop reducing function" ([acc] acc) ([acc _] acc))
+#_(defn- noprf "The noop reducing function" ([acc] acc) ([acc _] acc))
 
-(defn- multiplexable
+#_(defn- multiplexable
   "Creates a multiplexable reducing function (doesn't init or complete the uderlying rf)."
   [rf]
   (fn ([]) ([acc] acc) ([acc x] (rf acc x)))) ; no init no complete rf
 
-(defn by-key
+#_(defn by-key
   "Returns a transducer which partitions items according to kfn.
    It applies the transform specified by xform to each partition.
    Partitions contain the \"value part\" (as returned by vfn) of each item.
@@ -176,7 +177,7 @@
                   (vswap! m assoc! k noprf))
                 (unreduced acc)))))))))
 
-(defn- spawn
+#_(defn- spawn
   "Every n items, spawns a new pipeline."
   [n xform]
   (fn [rf]
@@ -206,7 +207,7 @@
               (vswap! vrfs persistent!)
               acc)))))))
 
-(defn pad [n padding-coll]
+#_(defn pad [n padding-coll]
   (fn [rf]
     (let [n (volatile! n)]
       (fn
@@ -217,7 +218,7 @@
           (vswap! n dec)
           (rf acc x))))))
 
-(defn partition
+#_(defn partition
   "Returns a partitioning transducer. Each partition is independently transformed using the xform transducer.
    Unlike clojure.core/partition the last partitions may be incomplete.
    Partitions can be padded using #'pad."
@@ -228,7 +229,7 @@
   ([n step xform]
     (spawn step (comp (take n) xform))))
 
-(defn avg
+#_(defn avg
   "Reducing fn to compute the arithmetic mean."
   ([]
     (let [count (volatile! 0)
@@ -242,7 +243,7 @@
   ([acc] (acc))
   ([acc x] (acc x)))
 
-(defn window
+#_(defn window
   "Returns a transducer which computes an accumulator over the last n items
    using two functions: f and its inverse invf.
 
@@ -275,9 +276,9 @@
                 (vreset! vi (let [i (inc i)] (if (= n i) 0 i)))
                 (rf acc (f (vreset! vwacc (f (invf wacc x') x))))))))))))
 
-(defn count ([] 0) ([n] n) ([n _] (inc n)))
+#_(defn count ([] 0) ([n] n) ([n _] (inc n)))
 
-(defn juxt
+#_(defn juxt
   "Returns a reducing fn which compute all rfns at once and whose final return
    value is a vector of the final return values of each rfns."
   [& rfns]
@@ -291,7 +292,7 @@
                                false acc)]
           (if some-unreduced acc (reduced acc)))))))
 
-(defn juxt-map
+#_(defn juxt-map
   [& key-rfns]
   (let [f (apply juxt (take-nth 2 (next key-rfns)))
         keys (vec (take-nth 2 key-rfns))]
@@ -300,13 +301,13 @@
       ([acc] (zipmap keys (f acc)))
       ([acc x] (f acc x)))))
 
-(defn first
+#_(defn first
   "Reducing function that returns the first value or nil if none."
   ([] nil)
   ([x] x)
   ([_ x] (reduced x)))
 
-(defn transjuxt
+#_(defn transjuxt
   "Performs several transductions over coll at once. xforms-map can be a map or vector.
    Returns a map with the same keyset as xforms-map (or a vector of same size as xforms-map).
    Returns a transducer when coll is omitted."
